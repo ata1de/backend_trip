@@ -11,7 +11,7 @@ dayjs.locale('pt-br')
 dayjs(localizedFormat)
 
 export async function createTrip(app: FastifyInstance) {
-  app.withTypeProvider<ZodTypeProvider>().post("/trip", {
+  app.withTypeProvider<ZodTypeProvider>().post("/trips", {
     schema: {
       body: z.object({
         destination: z.string(),
