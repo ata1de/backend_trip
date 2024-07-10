@@ -53,7 +53,7 @@ export async function confirmTrip(app: FastifyInstance) {
         // promises.all executa um array de promises, assim podendo executar varias promisses de forma assincrona
         await Promise.all(
             trip.participant.map(async (participant) => {
-                const confirmationLink = `http://localhost:3333/trips/${trip.id}/confirm/${participant.id}`
+                const confirmationLink = `http://localhost:3333/participant/${participant.id}/confirm`
 
                 const message = await mail.sendMail({
                     from: {
