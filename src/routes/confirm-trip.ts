@@ -5,6 +5,8 @@ import { prisma } from "../lib/prisma";
 import { getMailClient } from "../lib/mail";
 import { dayjs } from "../lib/dayjs";
 import nodemailer from 'nodemailer'
+import { ClientError } from "../errors/client-error";
+import { env } from "../env";
 
 export async function confirmTrip(app: FastifyInstance) {
     app.withTypeProvider<ZodTypeProvider>().get('/trips/:tripId/confirm', {
@@ -30,12 +32,12 @@ export async function confirmTrip(app: FastifyInstance) {
         })
 
         if (!trip) {
-            throw new Error('Trip not found')
+            throw new ClientError('Trip not found')
         }
 
         // se o usuário confirmar uma partida ja confirmada ele sera redirecionado para uma rota no front
         if (trip.is_confirmed) {
-            reply.redirect(`http://localhost:3000/trips/${tripId}`)
+            reply.redirect(`${env.WEB_BASE_URL}/trips/${tripId}`)
         }
 
         // atualizar a trip para confirmada
@@ -53,7 +55,7 @@ export async function confirmTrip(app: FastifyInstance) {
         // promises.all executa um array de promises, assim podendo executar varias promisses de forma assincrona
         await Promise.all(
             trip.participant.map(async (participant) => {
-                const confirmationLink = `http://localhost:3333/participant/${participant.id}/confirm`
+                const confirmationLink = `${env.API_BASE_URL}/participant/${participant.id}/confirm`
 
                 const message = await mail.sendMail({
                     from: {
@@ -81,7 +83,7 @@ export async function confirmTrip(app: FastifyInstance) {
             })
         )
 
-        return reply.redirect(`http://localhost:3000/trips/${tripId}`)
+        return reply.redirect(`${env.WEB_BASE_URL}/trips/${tripId}`)
 
     })
 
