@@ -1,9 +1,8 @@
 import { FastifyInstance } from "fastify";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
-import { prisma } from "../lib/prisma";
-import { dayjs } from "../lib/dayjs";
-import { ClientError } from "../errors/client-error";
+import { PrismaActivityRepository } from "../repository/prisma/prisma-activity-repositories";
+import { CreateActivityUseCase } from "../use-cases/createActivityUseCase";
 
 export async function createActivity(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().post("/trip/:tripId/activities", {
@@ -21,27 +20,10 @@ export async function createActivity(app: FastifyInstance) {
 
     const { tripId } = request.params
 
-    const trip = await prisma.trip.findUnique({
-      where: {
-        id: tripId
-      }
-    })
+    const prismaActivityRepository = new PrismaActivityRepository()
+    const createActivityUseCase = new CreateActivityUseCase(prismaActivityRepository)
 
-    if (!trip) {
-      throw new ClientError('Trip not found')
-    }
+    const activity = await createActivityUseCase.execute({ title, occurs_at, tripId })
 
-    if (dayjs(occurs_at).isBefore(new Date())) {
-      throw new ClientError('Invalid activity date')
-    }
-
-    const activity = await prisma.activity.create({
-      data: {
-        title,
-        occurs_at,
-        trip_id: tripId
-      }
-    })
-
-    return { activityId: activity.id}
+    return { activityId: activity.activityId}
 })}    
