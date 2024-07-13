@@ -1,11 +1,10 @@
 import { FastifyInstance } from "fastify";
 import { ClientError } from "./errors/client-error";
 import { ZodError } from "zod";
-import { relative } from "path";
 
 type FastifyErroHandler = FastifyInstance['errorHandler']
 
-export const errorHandler: FastifyErroHandler = (error, request, reply) => {7
+export const errorHandler: FastifyErroHandler = (error, request, reply) => {
     if (error instanceof ZodError) {
         return reply.status(400).send({
             message: 'Invalid input',
