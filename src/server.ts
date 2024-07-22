@@ -1,18 +1,18 @@
-import fastify from 'fastify'
-import { createTrip } from './routes/create-trip'
+import cors from '@fastify/cors';
+import fastify from 'fastify';
 import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
-import { confirmTrip } from './routes/confirm-trip';
-import cors from '@fastify/cors'
 import { confirmParticipants } from './routes/confirm-participant';
+import { confirmTrip } from './routes/confirm-trip';
 import { createActivity } from './routes/create-activity';
-import { getActivities } from './routes/get-activities';
-import { createLink } from './routes/create-link';
-import { getLinks } from './routes/get-links';
-import { getParticipants } from './routes/get-participants';
 import { createInvite } from './routes/create-invite';
-import { updateTrip } from './routes/update-trip';
-import { getTripDetails } from './routes/get-trip-details';
+import { createLink } from './routes/create-link';
+import { createTrip } from './routes/create-trip';
+import { getActivities } from './routes/get-activities';
+import { getLinks } from './routes/get-links';
 import { getParticipantsDetails } from './routes/get-participant-details';
+import { getParticipants } from './routes/get-participants';
+import { getTripDetails } from './routes/get-trip-details';
+import { updateTrip } from './routes/update-trip';
 
 const app = fastify()
 
@@ -43,6 +43,6 @@ app.get('/', async (request, reply) => {
 
 })
 
-app.listen({port: 3333}).then(() => {
+app.listen({ port: 3333, host: '0.0.0.0' }).then(() => {
     console.log('Server is running on http://localhost:3333 🚀')
 })
