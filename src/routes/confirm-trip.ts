@@ -14,13 +14,11 @@ export async function confirmTrip(app: FastifyInstance) {
     }, async (request, reply) => {
         const { tripId } = request.params
 
-        const prismaTripRepository = new PrismaTripRepository()
-        const tripUseCase = new ConfirmTripUseCase(prismaTripRepository)
+        const TripRepository = new PrismaTripRepository()
+        const confirmTripUseCase = new ConfirmTripUseCase(TripRepository)
 
-        const redirectUrl = await tripUseCase.execute({ tripId })
-        
-        return reply.redirect(redirectUrl)
-
+        const redirectUrl = await confirmTripUseCase.execute({ tripId })
+        reply.redirect(redirectUrl)
     })
 
 }
