@@ -1,16 +1,30 @@
 import { prisma } from "../../lib/prisma";
-import { TripRepository } from "../trip-repository";
+import { createTripRequest, TripRepository } from "../trip-repository";
 
 export class PrismaTripRepository implements TripRepository {
-    async create(tripId: string, tripDestination: string, tripStartDate: Date, tripEndDate: Date) {
+    async create(data: createTripRequest) {
         const trip = await prisma.trip.create({
             data: {
-                id: tripId,
-                destination: tripDestination,
-                start_at: tripStartDate,
-                end_at: tripEndDate
+                destination: data.destination,
+                start_at: data.start_at,
+                end_at: data.end_at,
+                participant: {
+                createMany: {
+                    data: [
+                    {
+                        email: data.owner_email,
+                        name: data.owner_name,
+                        is_confirmed: true,
+                        is_owner: true
+                    },
+                    ...data.emails_to_invite.map(email => {
+                        return { email };
+                    })
+                    ]
+                }
+                }
             }
-        })
+            })
 
         return trip
     }

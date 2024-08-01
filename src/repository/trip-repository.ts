@@ -12,8 +12,17 @@ type findUniqueConfirmTripResponse = Trip & {
     participant: Participant[];
 };
 
+export interface createTripRequest {
+    destination: string;
+    start_at: Date;
+    end_at: Date;
+    owner_email: string;
+    owner_name: string;
+    emails_to_invite: string[];
+}
+
 export interface TripRepository {
-    create(tripId: string, tripDestination: string, tripStartDate: Date, tripEndDate: Date): Promise<Trip>;
+    create(data: createTripRequest): Promise<Trip>;
     findUnique(tripId: string): Promise<Trip | null>;
     updateConfirmTrip(tripId: string): Promise<Trip>;
     updateTrip(tripId: string, tripDestination: string, tripStartDate: Date, tripEndDate: Date): Promise<Trip>;
