@@ -1,8 +1,9 @@
 import { FastifyInstance } from "fastify";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
-import { prisma } from "../lib/prisma";
-import { ClientError } from "../errors/client-error";
+import { PrismaLinkRepository } from "../repository/prisma/prisma-link-repositories";
+import { PrismaTripRepository } from "../repository/prisma/prisma-trip-repositories";
+import { CreateLinkUseCase } from "../use-cases/createLinkUseCase";
 
 export async function createLink(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().post("/trip/:tripId/links", {
@@ -20,23 +21,14 @@ export async function createLink(app: FastifyInstance) {
 
     const { tripId } = request.params
 
-    const trip = await prisma.trip.findUnique({
-      where: {
-        id: tripId
-      }
-    })
+    const tripRepository = new PrismaTripRepository()
+    const linkRepository = new PrismaLinkRepository()
 
-    if (!trip) {
-      throw new ClientError('Trip not found')
+    const createLinkUseCase = new CreateLinkUseCase(tripRepository, linkRepository)
+
+    const linkId = await createLinkUseCase.execute({ tripId, title, url })
+
+    return {
+      linkId: linkId
     }
-
-    const link = await prisma.link.create({
-      data: {
-        title,
-        url,
-        trip_id: tripId
-      }
-    })
-
-    return { linkId: link.id}
-})}    
+})}  
