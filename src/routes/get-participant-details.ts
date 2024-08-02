@@ -1,8 +1,8 @@
 import { FastifyInstance } from "fastify";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
-import { prisma } from "../lib/prisma";
-import { ClientError } from "../errors/client-error";
+import { PrismaParticipantRepository } from "../repository/prisma/prisma-participant-repositories";
+import { GetParticipantDetailsUseCase } from "../use-cases/getParticipantDetailsUseCase";
 
 export async function getParticipantsDetails(app: FastifyInstance) {
     app.withTypeProvider<ZodTypeProvider>().get('/participant/:participantId', {
@@ -14,19 +14,10 @@ export async function getParticipantsDetails(app: FastifyInstance) {
     }, async (request, reply) => {
         const { participantId } = request.params
 
-        const participant = await prisma.participant.findUnique({
-            where: { id: participantId},
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                is_confirmed: true
-            }
-        })
+        const ParticipantRepository = new PrismaParticipantRepository()
+        const getParticipantDetailsUseCase = new GetParticipantDetailsUseCase(ParticipantRepository)
 
-        if (!participant) {
-            throw new ClientError('Participant not found')
-         }
+        const participant = await getParticipantDetailsUseCase.execute({ participantId })
 
         reply.status(200).send({
             participant
