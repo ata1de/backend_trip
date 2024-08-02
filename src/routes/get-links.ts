@@ -1,8 +1,8 @@
 import { FastifyInstance } from "fastify";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
-import { prisma } from "../lib/prisma";
-import { ClientError } from "../errors/client-error";
+import { PrismaTripRepository } from "../repository/prisma/prisma-trip-repositories";
+import { GetLinkUseCase } from "../use-cases/getLinksUseCase";
 
 export async function getLinks(app: FastifyInstance) {
     app.withTypeProvider<ZodTypeProvider>().get('/trip/:tripId/links', {
@@ -14,20 +14,29 @@ export async function getLinks(app: FastifyInstance) {
     }, async (request, reply) => {
         const { tripId } = request.params
 
-        const trip = await prisma.trip.findUnique({
-            where: { id: tripId},
-            include:{ 
-                links: true,
-                
-            }
-        })
+        const TripRepository = new PrismaTripRepository()
+        const getLinkUseCase = new GetLinkUseCase(TripRepository)
 
-        if (!trip) {
-                throw new ClientError('Trip not found')
-         }
+        const links = await getLinkUseCase.execute({ tripId })
 
         reply.status(200).send({
-            links: trip.links
+            links:links
         })
 
 })}
+
+// const trip = await prisma.trip.findUnique({
+//     where: { id: tripId},
+//     include:{ 
+//         links: true,
+        
+//     }
+// })
+
+// if (!trip) {
+//         throw new ClientError('Trip not found')
+//  }
+
+// reply.status(200).send({
+//     links: trip.links
+// })

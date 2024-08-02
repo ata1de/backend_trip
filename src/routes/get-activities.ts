@@ -19,10 +19,8 @@ export async function getActivities(app: FastifyInstance) {
 
         const activities = await createTripUseCase.execute({ tripId })
 
-        if (activities) {
-            reply.status(200).send(activities)
-        } else {
-            reply.status(500).send({ message: 'Error server in get Activities' })
-        }
+        reply.status(200).send({
+            activities
+        })
 
 })}
