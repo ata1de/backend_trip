@@ -29,6 +29,10 @@ type findUniqueGetLinksResponse = Trip & {
     links: Link[];
 }
 
+type findUniqueGetParticipantsResponse = Trip & {
+    participant: Partial<Participant>[];
+};
+
 export interface TripRepository {
     create(data: createTripRequest): Promise<Trip>;
     findUnique(tripId: string): Promise<Trip | null>;
@@ -37,6 +41,6 @@ export interface TripRepository {
     findUniqueConfirmTrip(tripId: string): Promise<findUniqueConfirmTripResponse | null>;
     findUniqueGetActivities(tripId: string): Promise<findUniqueGetActivitiesResponse | null>;
     findUniqueGetLinks(tripId: string): Promise<findUniqueGetLinksResponse | null>;
-    findUniqueGetParticipants(tripId: string): Promise<Trip | null>;
+    findUniqueGetParticipants(tripId: string): Promise<findUniqueGetParticipantsResponse | null>;
     findUniqueTripDetails(tripId: string): Promise<findUniqueTripDetailsResponse | null>;
 }
